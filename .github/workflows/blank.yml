@@ -9,7 +9,7 @@ jobs:
   newman: 
     runs-on: ubuntu-latest 
     steps:
-      - uses: actions/chekout@v3
+      - uses: actions/checkout@v3
 
       - name: Create dir for report
         run: |
