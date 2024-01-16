@@ -1,0 +1,373 @@
+{
+	"info": {
+		"_postman_id": "c643e5cc-3827-46c4-b965-6f9ad8581f9f",
+		"name": "ServeRest",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "17207218",
+		"_collection_link": "https://crimson-desert-644631.postman.co/workspace/Maicon~106e249b-526f-42b6-8348-ab12c324ebf7/collection/17207218-c643e5cc-3827-46c4-b965-6f9ad8581f9f?action=share&source=collection_link&creator=17207218"
+	},
+	"item": [
+		{
+			"name": "geração de massa",
+			"item": [
+				{
+					"name": "usuários",
+					"item": [
+						{
+							"name": "novo cadastro",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.globals.unset(\"schema\");\r",
+											"pm.globals.unset(\"userName\");\r",
+											"pm.globals.unset(\"userEmail\");\r",
+											"pm.globals.unset(\"userPassword\");\r",
+											"\r",
+											"pm.globals.set(\"schema\", {\r",
+											"  \"$schema\": \"http://json-schema.org/draft-04/schema#\",\r",
+											"  \"type\": \"object\",\r",
+											"  \"properties\": {\r",
+											"    \"message\": {\r",
+											"      \"type\": \"string\"\r",
+											"    }\r",
+											"  },\r",
+											"  \"required\": [\r",
+											"    \"message\"\r",
+											"  ]\r",
+											"}\r",
+											"\r",
+											");\r",
+											"\r",
+											"/**\r",
+											" * Contrato \r",
+											" */\r",
+											"\r",
+											"pm.globals.set(\"userName\", pm.iterationData.get(\"userName\")) \r",
+											"pm.globals.set(\"userEmail\", pm.iterationData.get(\"userEmail\")) \r",
+											"pm.globals.set(\"userPassword\", pm.iterationData.get(\"userPassword\")) \r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Validar status code 201\", function () {\r",
+											"    pm.response.to.have.status(201);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validar message\", function(){\r",
+											"    pm.expect(pm.response.json().message).to.be.eql(\"Cadastro realizado com sucesso\")\r",
+											"})\r",
+											"\r",
+											"pm.test(\"Validar o id\", function(){\r",
+											"    pm.globals.set(\"userID\", pm.response.json()._id)\r",
+											"})\r",
+											"\r",
+											"pm.test('Schema is valid', function () {\r",
+											"    pm.expect(tv4.validate(pm.response.json(), pm.globals.get(\"schema\"))).to.be.true;\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"nome\": \"{{userName}}\",\r\n    \"email\": \"{{userEmail}}\",\r\n    \"password\": \"{{userPassword}}\",\r\n    \"administrador\": \"false\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://serverest.dev/usuarios",
+									"protocol": "https",
+									"host": [
+										"serverest",
+										"dev"
+									],
+									"path": [
+										"usuarios"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Buscar usuário pelo id",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"\r",
+											"pm.test(\"O status code e 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validar o id\", function(){\r",
+											"    pm.expect(pm.response.json()._id).to.be.eql(pm.globals.get(\"userID\"))\r",
+											"})\r",
+											"\r",
+											"pm.test(\"Validar o nome\", function(){\r",
+											"    pm.expect(pm.response.json().nome).to.be.eql(pm.globals.get(\"userName\"))\r",
+											"})\r",
+											"\r",
+											"pm.test(\"Validar o Email\", function(){\r",
+											"    pm.expect(pm.response.json().email).to.be.eql(pm.globals.get(\"userEmail\"))\r",
+											"})\r",
+											"\r",
+											"\r",
+											"pm.test(\"Validar o Password\", function(){\r",
+											"    pm.expect(pm.response.json().password).to.be.eql(pm.globals.get(\"userPassword\"))\r",
+											"})"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{baseURL}}/usuarios/{{userID}}",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"usuarios",
+										"{{userID}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "atualizar usuário",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validar a message\", function(){\r",
+											"    pm.expect(pm.response.json().message).to.be.eql(\"Registro alterado com sucesso\")\r",
+											"})"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"nome\": \"{{userName}}\",\r\n    \"email\": \"{{userEmail}}\",\r\n    \"password\": \"{{userPassword}}\",\r\n    \"administrador\": \"false\"\r\n}"
+								},
+								"url": {
+									"raw": "{{baseURL}}/usuarios/{{userID}}",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"usuarios",
+										"{{userID}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Buscar usuário atualizado",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Validar usuario com ADM\", function(){\r",
+											"    pm.expect(pm.response.json().administrador).to.be.eql(\"false\")\r",
+											"})\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{baseURL}}/usuarios/{{userID}}",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"usuarios",
+										"{{userID}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "deletar usuário",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Validar que o registro foi apagado\", function(){\r",
+											"    pm.expect(pm.response.json().message).to.be.eql(\"Registro excluído com sucesso\")\r",
+											"})"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{baseURL}}/usuarios/{{userID}}",
+									"host": [
+										"{{baseURL}}"
+									],
+									"path": [
+										"usuarios",
+										"{{userID}}"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "buscar nova pessoa",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"console.log(pm.response.json().results[0].name.first)\r",
+									"pm.globals.set(\"userName\", pm.response.json().results[0].name.first)\r",
+									"\r",
+									"pm.globals.set(\"userEmail\", pm.response.json().results[0].email)\r",
+									"\r",
+									"pm.globals.set(\"userPassword\", pm.response.json().results[0].login.password)\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://randomuser.me/api/",
+							"protocol": "https",
+							"host": [
+								"randomuser",
+								"me"
+							],
+							"path": [
+								"api",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
